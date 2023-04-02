@@ -31,12 +31,13 @@ dependencies {
 }
 
 publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = 'com.github.AgungDev'
+    android.libraryVariants.each {
+        publishing.publications.create(variant.name,MavenPublication) {
+            from components.findByName(variant.name)
+
+            groupId = 'com.AgungDev'
             artifactId = 'ProgrezCloudApiAndroid'
             version = '1.0.0'
-
         }
     }
 }
