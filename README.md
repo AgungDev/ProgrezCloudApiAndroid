@@ -1,4 +1,4 @@
-# ProgrezCloudApiAndroid
+# Progrez Cloud API Android
 
 Untuk mengurangi waktu ngopi, saya meringkas penulisan kode untuk mengambil data dari project teman2.
 Kodingan ini melputi <b>Authentication User</b>, dan <b>Reading Tasks</b>. Lihatlah bagai mana saya mendapatkannya.
