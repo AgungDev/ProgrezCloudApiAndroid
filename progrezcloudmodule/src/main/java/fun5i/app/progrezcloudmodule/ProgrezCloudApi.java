@@ -58,7 +58,7 @@ public class ProgrezCloudApi {
         return result;
     }
 
-    public void setProject(PCLoginModel account,ProjectCallback abc, String tokenProject, String fields) {
+    public void getProject(PCLoginModel account,ProjectCallback abc, String tokenProject, String fields) {
         String payload = generatePayload(tokenProject, fields);
         ConnectionMethod loginMethod = new ConnectionMethod();
         loginMethod.setAccount(account);

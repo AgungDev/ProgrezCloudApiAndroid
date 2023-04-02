@@ -82,6 +82,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        progrezCloudApi.login(new ProgrezCloudApi.LoginCallback() {
+            @Override
+            public void responseLogin(int errno, String errmsg, PCLoginModel account) {
+                result.setText(account.getFullname());
+            }
+        },"");
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -113,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
                         if (errno > 0){
                             result.setText("Error: "+errmsg);
                         }else{
-                            progrezCloudApi.setProject(account, (int errno2, String errmsg2, String body) -> {
+                            progrezCloudApi.getProject(account, (int errno2, String errmsg2, String body) -> {
                                 if (errno2 > 0){
                                     result.setText("Error: "+errmsg2);
                                 }else{
@@ -128,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
                             result.setText("Error: "+errmsg);
                         }else{
 
-                            progrezCloudApi.setProject(account, (int errno2, String errmsg2, String body) -> {
+                            progrezCloudApi.getProject(account, (int errno2, String errmsg2, String body) -> {
                                 if (errno2 > 0){
                                     result.setText("Error: "+errmsg2);
                                 }else{
