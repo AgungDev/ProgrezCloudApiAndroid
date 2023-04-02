@@ -1,6 +1,5 @@
 plugins {
     id 'com.android.library'
-    id 'maven-publish'
 }
 
 android {
@@ -30,14 +29,3 @@ android {
 dependencies {
 }
 
-publishing {
-    android.libraryVariants.each {
-        publishing.publications.create(variant.name,MavenPublication) {
-            from components.findByName(variant.name)
-
-            groupId = 'com.github.AgungDev'
-            artifactId = 'ProgrezCloudApiAndroid'
-            version = '1.0.0'
-        }
-    }
-}
