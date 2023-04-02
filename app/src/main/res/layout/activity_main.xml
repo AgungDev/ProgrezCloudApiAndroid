@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="userkey"
+        android:checked="true"
+        android:layout_marginRight="50px"
+        android:layout_alignParentRight="true"
+        android:id="@+id/checkbox_login"/>
+
+    <LinearLayout
+        android:layout_margin="5dp"
+        android:layout_below="@+id/checkbox_login"
+        android:id="@+id/line"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="User Auth"
+            android:textSize="35px"
+            android:layout_marginLeft="10px"/>
+
+        <EditText
+            android:id="@+id/eUserkey"
+            android:hint="user key"
+            android:inputType="textPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <EditText
+            android:visibility="gone"
+            android:id="@+id/eusername"
+            android:hint="username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <EditText
+            android:visibility="gone"
+            android:id="@+id/epass"
+            android:inputType="textPassword"
+            android:hint="password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:layout_marginTop="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Project Token"
+            android:textSize="35px"
+            android:layout_marginLeft="10px"/>
+
+        <EditText
+            android:id="@+id/eproject"
+            android:hint="project token"
+            android:inputType="textPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <EditText
+            android:id="@+id/efields"
+            android:hint="fields"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/login"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="login"/>
+
+            <Button
+                android:layout_marginLeft="10dp"
+                android:id="@+id/execute"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="project"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/line">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="null"
+            android:id="@+id/result"
+            android:textSize="22dp"
+            android:layout_margin="5dp"/>
+    </ScrollView>
+
+</RelativeLayout>
