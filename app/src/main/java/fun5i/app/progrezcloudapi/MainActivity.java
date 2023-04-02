@@ -82,12 +82,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        progrezCloudApi.login(new ProgrezCloudApi.LoginCallback() {
-            @Override
-            public void responseLogin(int errno, String errmsg, PCLoginModel account) {
-                result.setText(account.getFullname());
-            }
-        },"");
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
