@@ -28,8 +28,9 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-import fun5i.app.progrezcloudmodule.Model.*;
-import fun5i.app.progrezcloudmodule.ProgrezCloudApi;
+import fun5i.app.api.Model.PCLoginModel;
+import fun5i.app.api.ProgrezCloudApi;
+
 
 public class MainActivity extends AppCompatActivity {
 
