@@ -35,7 +35,7 @@ publishing {
         publishing.publications.create(variant.name,MavenPublication) {
             from components.findByName(variant.name)
 
-            groupId = 'com.AgungDev'
+            groupId = 'com.github.AgungDev'
             artifactId = 'ProgrezCloudApiAndroid'
             version = '1.0.0'
         }
