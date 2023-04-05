@@ -26,8 +26,11 @@ progrezCloudApi.login((int errno, String errmsg, PCLoginModel account) -> {
       setNama(account.getFullName());             // menampilkan namamu
       setGambarProfile(account.getProfile());     // menampilkan gambar profile
       tampilkanProject(body);                     // menampilkan project
-    },"TOKEN_PROJECT", "task_name, nominal");
-    
+    },"TOKEN_PROJECT", new String[]{
+         "all", // maintask field
+         "all", // task field
+         "all" // subtask field
+    });
 },"USER_KEY");
 ```
 ## implementation
@@ -41,7 +44,7 @@ allprojects {
 ```
 ```
 dependencies {
-  implementation 'com.github.AgungDev:ProgrezCloudApiAndroid:1.0.0'
+  implementation 'com.github.AgungDev:ProgrezCloudApiAndroid:1.1.1'
 }
 ```
 
