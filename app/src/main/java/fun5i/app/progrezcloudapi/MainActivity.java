@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
                                 }else{
                                     result.setText(formatString(body));
                                 }
-                            }, eProject.getText().toString(), eFields.getText().toString());
+                            }, eProject.getText().toString(), new String[]{"all", "all", "all"});
                         }
                     },eUserKey.getText().toString());
                 }else{
@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
                                 }else{
                                     result.setText(formatString(body));
                                 }
-                            }, eProject.getText().toString(), eFields.getText().toString());
+                            }, eProject.getText().toString(), new String[]{"all", "all", "all"});
                         }
                     },eUsername.getText().toString(), ePassword.getText().toString());
                 }

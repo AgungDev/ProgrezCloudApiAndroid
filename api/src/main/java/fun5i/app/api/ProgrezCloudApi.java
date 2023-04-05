@@ -17,7 +17,7 @@ import fun5i.app.api.Model.PCLoginModel;
 
 
 /**
- * version 1.0.1
+ * version 1.1.1
  * @author fun5i
  */
 public class ProgrezCloudApi {
@@ -37,19 +37,20 @@ public class ProgrezCloudApi {
     public ProgrezCloudApi(){
     }
 
-    private String generatePayload(String tokenProject, String fields){
+    private String generatePayload(String tokenProject, String[] fields){
         String result = null;
         try {
             JSONObject payload = new JSONObject();
             JSONObject payload2 = new JSONObject();
-            JSONObject payload3 = new JSONObject();
 
-            payload3.put("fields", fields);
-            payload2.put("maintask", payload3);
-            payload2.put("task", payload3);
-            payload2.put("subtask", payload3);
+            payload2.put("maintask", new JSONObject().put("fields", fields[0]));
+            payload2.put("task", new JSONObject().put("fields", fields[1]));
+            payload2.put("subtask", new JSONObject().put("fields", fields[2]));
+
             payload.put("tasks", payload2);
             payload.put("token", tokenProject);
+
+            result = payload.toString();
 
             result = payload.toString();
         }catch (JSONException e){
@@ -59,7 +60,7 @@ public class ProgrezCloudApi {
         return result;
     }
 
-    public void getProject(PCLoginModel account,ProjectCallback abc, String tokenProject, String fields) {
+    public void getProject(PCLoginModel account,ProjectCallback abc, String tokenProject, String[] fields) {
         String payload = generatePayload(tokenProject, fields);
         ConnectionMethod loginMethod = new ConnectionMethod();
         loginMethod.setAccount(account);
