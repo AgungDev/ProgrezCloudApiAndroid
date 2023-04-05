@@ -1,7 +1,6 @@
 package fun5i.app.api;
 
 import android.os.AsyncTask;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,7 +17,7 @@ import fun5i.app.api.Model.PCLoginModel;
 
 
 /**
- *
+ * version 1.0.1
  * @author fun5i
  */
 public class ProgrezCloudApi {
@@ -68,16 +67,10 @@ public class ProgrezCloudApi {
         loginMethod.responds((String body) ->{
             try{
                 JSONObject res = new JSONObject(body);
-                if(res.getInt("errno")>0)
-                    abc.responseProject(
-                            res.getInt("errno"),
-                            res.getString("errmsg"),
-                            res.toString());
-                else
-                    abc.responseProject(
-                            res.getInt("errno"),
-                            res.getString("errmsg"),
-                            res.getJSONObject("data").toString());
+                abc.responseProject(
+                    res.getInt("errno"),
+                    res.getString("errmsg"),
+                    (res.getInt("errno")>0)? res.toString():res.getJSONObject("data").toString());
             }catch (JSONException e){
                 e.printStackTrace();
             }
@@ -92,16 +85,10 @@ public class ProgrezCloudApi {
         loginMethod.responds((String body) -> {
                     try{
                         JSONObject respond = new JSONObject(body);
-                        if(respond.getInt("errno")>0)
-                            a.responseLogin(
-                                respond.getInt("errno"),
-                                respond.getString("errmsg"),
-                                null);
-                        else
-                            a.responseLogin(
-                                    respond.getInt("errno"),
-                                    respond.getString("errmsg"),
-                                    generateAccount(respond));
+                        a.responseLogin(
+                            respond.getInt("errno"),
+                            respond.getString("errmsg"),
+                                (respond.getInt("errno")>0)?null:generateAccount(respond));
                     }catch (JSONException e){
                         e.printStackTrace();
                     }
@@ -116,16 +103,10 @@ public class ProgrezCloudApi {
             loginMethod.responds((String body) -> {
                     try{
                         JSONObject respond = new JSONObject(body);
-                        if(respond.getInt("errno")>0)
-                            a.responseLogin(
-                                    respond.getInt("errno"),
-                                    respond.getString("errmsg"),
-                                    null);
-                        else
-                            a.responseLogin(
-                                    respond.getInt("errno"),
-                                    respond.getString("errmsg"),
-                                    generateAccount(respond));
+                        a.responseLogin(
+                                respond.getInt("errno"),
+                                respond.getString("errmsg"),
+                                (respond.getInt("errno")>0)?null:generateAccount(respond));
                     }catch (JSONException e){
                         e.printStackTrace();
                     }
