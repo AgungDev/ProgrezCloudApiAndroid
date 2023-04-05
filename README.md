@@ -44,3 +44,8 @@ dependencies {
   implementation 'com.github.AgungDev:ProgrezCloudApiAndroid:1.0.0'
 }
 ```
+
+### Update Version
+```
+varsion {function}.{parameter}.{other}
+```
