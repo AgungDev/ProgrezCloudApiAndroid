@@ -27,5 +27,7 @@ android {
 }
 
 dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation files('libs/gson-2.8.9.jar')
 }
 

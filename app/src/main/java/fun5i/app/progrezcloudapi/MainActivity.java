@@ -14,7 +14,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
@@ -29,6 +28,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 import fun5i.app.api.Model.PCLoginModel;
+import fun5i.app.api.Model.PCProjectModel;
 import fun5i.app.api.ProgrezCloudApi;
 
 
@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                         if (errno > 0){
                             result.setText("Error: "+errmsg);
                         }else{
-                            result.setText(formatString(new Gson().toJson(account)));
+                            result.setText(account.getFullname());
                         }
                     },eUserKey.getText().toString());
                 }else{
@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
                         if (errno > 0){
                             result.setText("Error: "+errmsg);
                         }else{
-                            result.setText(formatString(new Gson().toJson(account)));
+                            result.setText(account.getFullname());
                         }
                     },eUsername.getText().toString(), ePassword.getText().toString());
                 }
@@ -114,11 +114,11 @@ public class MainActivity extends AppCompatActivity {
                         if (errno > 0){
                             result.setText("Error: "+errmsg);
                         }else{
-                            progrezCloudApi.getProject(account, (int errno2, String errmsg2, String body) -> {
+                            progrezCloudApi.getProject(account, (int errno2, String errmsg2, PCProjectModel body) -> {
                                 if (errno2 > 0){
                                     result.setText("Error: "+errmsg2);
                                 }else{
-                                    result.setText(formatString(body));
+                                    result.setText(body.getData().getProject().getName());
                                 }
                             }, eProject.getText().toString(), new String[]{"all", "all", "all"});
                         }
@@ -129,11 +129,11 @@ public class MainActivity extends AppCompatActivity {
                             result.setText("Error: "+errmsg);
                         }else{
 
-                            progrezCloudApi.getProject(account, (int errno2, String errmsg2, String body) -> {
+                            progrezCloudApi.getProject(account, (int errno2, String errmsg2, PCProjectModel body) -> {
                                 if (errno2 > 0){
                                     result.setText("Error: "+errmsg2);
                                 }else{
-                                    result.setText(formatString(body));
+                                    result.setText(body.getData().getProject().getName());
                                 }
                             }, eProject.getText().toString(), new String[]{"all", "all", "all"});
                         }

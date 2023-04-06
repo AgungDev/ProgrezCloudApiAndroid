@@ -1,6 +1,9 @@
 package fun5i.app.api;
 
 import android.os.AsyncTask;
+
+import com.google.gson.Gson;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -14,10 +17,11 @@ import java.nio.charset.StandardCharsets;
 
 import fun5i.app.api.Model.PCCredentials;
 import fun5i.app.api.Model.PCLoginModel;
+import fun5i.app.api.Model.PCProjectModel;
 
 
 /**
- * version 1.1.1
+ * version 1.2.0
  * @author fun5i
  */
 public class ProgrezCloudApi {
@@ -26,7 +30,7 @@ public class ProgrezCloudApi {
 
     @FunctionalInterface
     public interface ProjectCallback{
-        void responseProject(int errno2, String errmsg2, String body);
+        void responseProject(int errno2, String errmsg2, PCProjectModel body);
     }
 
     @FunctionalInterface
@@ -68,10 +72,20 @@ public class ProgrezCloudApi {
         loginMethod.responds((String body) ->{
             try{
                 JSONObject res = new JSONObject(body);
+                PCProjectModel projectModel = null;
+
+                // convert to object
+                if (res.getInt("errno") == 0){
+                    Gson gson =new Gson();
+                    projectModel = gson.fromJson(
+                            res.getJSONObject("data").toString(), PCProjectModel.class);
+                    //System.out.println("Berhasil " + projectModel.getData().getMaintask().get(0).getTaskName());
+                }
+
                 abc.responseProject(
                     res.getInt("errno"),
                     res.getString("errmsg"),
-                    (res.getInt("errno")>0)? res.toString():res.getJSONObject("data").toString());
+                    projectModel);
             }catch (JSONException e){
                 e.printStackTrace();
             }
