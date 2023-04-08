@@ -67,7 +67,7 @@ allprojects {
 ```
 ```
 dependencies {
-  implementation 'com.github.AgungDev:ProgrezCloudApiAndroid:1.2.0'
+  implementation 'com.github.AgungDev:ProgrezCloudApiAndroid:2.0.0'
 }
 ```
 
