@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -27,6 +28,7 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
+import fun5i.app.api.Model.PCCredentials;
 import fun5i.app.api.Model.PCLoginModel;
 import fun5i.app.api.Model.PCProjectModel;
 import fun5i.app.api.ProgrezCloudApi;
@@ -34,11 +36,15 @@ import fun5i.app.api.ProgrezCloudApi;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "MainActivity";
+
     private CheckBox checkBox;
     private ProgrezCloudApi progrezCloudApi;
     private EditText eUserKey, eUsername, ePassword, eProject, eFields;
     private Button execute, login;
     private TextView result;
+    private ProgrezCloudApi api;
+    private PCCredentials credentials;
 
     private void gui(){
         checkBox = findViewById(R.id.checkbox_login);
@@ -51,9 +57,9 @@ public class MainActivity extends AppCompatActivity {
         login = findViewById(R.id.login);
         result = findViewById(R.id.result);
 
-        eUserKey.setText("YN7MLHFVZG5DDR62SCIYPH4BHWHU180PKW0U35ESB9UDQQ48RCW5IP5PBC829YGJ");
-        /*eUsername.setText("username");
-        ePassword.setText("Create a Progrez Cloud Account");*/
+        eUserKey.setText("Y4K7NE452H5VTMI43TUC3OS2336FZX6MQGJ2JCWBJQV223WULGWETE5M61QVOM63");
+        eUsername.setText("username");
+        ePassword.setText("Create a Progrez Cloud Account");
         eProject.setText("r7tu88x2kkcsqveqk3ssn1jlqq15p3d6");
 
         eFields.setText("task_name");
@@ -87,21 +93,26 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(checkBox.isChecked()){
-                    progrezCloudApi.login((int errno, String errmsg, PCLoginModel account) -> {
-                        if (errno > 0){
-                            result.setText("Error: "+errmsg);
-                        }else{
+                    api = new ProgrezCloudApi().setUserKey(eUserKey.getText().toString());
+                    api.login((int errno, String errmsg, PCLoginModel account) -> {
+                        if (errno == 0) {
                             result.setText(account.getFullname());
+                        } else {
+                            result.setText(errmsg);
                         }
-                    },eUserKey.getText().toString());
+                    });
+                    Log.i(TAG, "onClick1.1: "+ api.getCredentials().getS());
+
+
                 }else{
-                    progrezCloudApi.login((int errno, String errmsg, PCLoginModel account) -> {
-                        if (errno > 0){
-                            result.setText("Error: "+errmsg);
-                        }else{
+                    api = new ProgrezCloudApi().setUserLogin(eUsername.getText().toString(), ePassword.getText().toString());
+                    api.login((int errno, String errmsg, PCLoginModel account) -> {
+                        if (errno == 0) {
                             result.setText(account.getFullname());
+                        } else {
+                            result.setText(errmsg);
                         }
-                    },eUsername.getText().toString(), ePassword.getText().toString());
+                    });
                 }
             }
         });
@@ -110,34 +121,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(checkBox.isChecked()){
-                    progrezCloudApi.login((int errno, String errmsg, PCLoginModel account) -> {
-                        if (errno > 0){
-                            result.setText("Error: "+errmsg);
-                        }else{
-                            progrezCloudApi.getProject(account, (int errno2, String errmsg2, PCProjectModel body) -> {
-                                if (errno2 > 0){
-                                    result.setText("Error: "+errmsg2);
-                                }else{
-                                    result.setText(body.getData().getProject().getName());
-                                }
-                            }, eProject.getText().toString(), new String[]{"all", "all", "all"});
-                        }
-                    },eUserKey.getText().toString());
+                    api.setProject(eProject.getText().toString(), new String[]{"all", "all", "all"});
+                    if(api.getError() == 0){
+                        result.setText("project "+api.getProject().getName()+" berhasil di dapatakan");
+                    }else{
+                        result.setText(api.getErrorMessage());
+                    }
                 }else{
-                    progrezCloudApi.login((int errno, String errmsg, PCLoginModel account) -> {
-                        if (errno > 0){
-                            result.setText("Error: "+errmsg);
-                        }else{
 
-                            progrezCloudApi.getProject(account, (int errno2, String errmsg2, PCProjectModel body) -> {
-                                if (errno2 > 0){
-                                    result.setText("Error: "+errmsg2);
-                                }else{
-                                    result.setText(body.getData().getProject().getName());
-                                }
-                            }, eProject.getText().toString(), new String[]{"all", "all", "all"});
-                        }
-                    },eUsername.getText().toString(), ePassword.getText().toString());
+                    api.setProject(eProject.getText().toString(), new String[]{"all", "all", "all"});
+                    if(api.getError() == 0){
+                        result.setText("project "+api.getProject().getName()+" berhasil di dapatakan");
+                    }else{
+                        result.setText(api.getErrorMessage());
+                    }
                 }
             }
         });

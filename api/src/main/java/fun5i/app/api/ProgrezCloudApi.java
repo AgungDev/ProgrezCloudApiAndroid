@@ -1,6 +1,7 @@
 package fun5i.app.api;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.google.gson.Gson;
 
@@ -15,6 +16,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -34,6 +36,12 @@ public class ProgrezCloudApi {
 
     private static final String TAG = "ProgrezCloudApi";
 
+    // update 2.0.0
+    public interface ProgrezApiListener{
+        void onSuccess();
+        void onError(int errorCode, String errorMessage);
+    }
+
     // update 1.2.0
     @FunctionalInterface
     public interface ProjectCallback{
@@ -51,9 +59,10 @@ public class ProgrezCloudApi {
     }
 
     // update 2.0.0
-    private int error = 0;
-    private String errorMessage = "ok";
-    private String userkey;
+    private int error = -1;
+    private String errorMessage = "lah kok kosong";
+    private boolean loginType;
+    private String userkey, username, password;
     private PCLoginModel loginModel;
     private PCCredentials credentials;
     private Project project;
@@ -83,21 +92,16 @@ public class ProgrezCloudApi {
     }
 
     // update 2.0.0
-    public void setMaintasks(List<Maintask> maintasks) {
-        this.maintasks = maintasks;
-    }
-
-    // update 2.0.0
     public String getUserkey() {
         return userkey;
     }
 
-    public PCLoginModel getLoginModel() {
+    public PCLoginModel getProfileUser() {
         return loginModel;
     }
 
     // update 2.0.0
-    public void setLoginModel(PCLoginModel loginModel) {
+    private void setLoginModel(PCLoginModel loginModel) {
         this.loginModel = loginModel;
     }
 
@@ -154,190 +158,171 @@ public class ProgrezCloudApi {
     }
 
     // update 2.0.0
-    public void setProject(String tokenProject, String[] fields){
-        String payload = generatePayload(tokenProject, fields);
-        ConnectionMethod connectionMethod = new ConnectionMethod();
-        connectionMethod.setAccount(getLoginModel());
-        connectionMethod.execute("project", payload);
-        connectionMethod.responds((String body) ->{
-            try{
-                PCProjectModel out = null;
-                JSONObject res = new JSONObject(body);
-                // convert to object
-                if (res.getInt("errno") == 0){
-                    // setCredential
-                    JSONObject crid = res.getJSONObject("credentials");
-                    PCCredentials newCCredentials = new PCCredentials(
-                            crid.getString("d"),
-                            crid.getString("s"),
-                            crid.getString("o")
-                    );
-                    setCredentials(newCCredentials);
-                    setLoginModel(new PCLoginModel(
-                            this.loginModel.getFlying_id(),
-                            this.loginModel.getFullname(),
-                            this.loginModel.getPhoto(),
-                            newCCredentials
-                    ));
-
-                    Gson gson =new Gson();
-                    out = gson.fromJson(
-                            res.getJSONObject("data").toString(), PCProjectModel.class);
-                    //System.out.println("Berhasil " + projectModel.getData().getMaintask().get(0).getTaskName());
-                }else{
-                    setError(res.getInt("errno"));
-                    setErrorMessage(res.getString("errmsg"));
-                }
-                setSemuaObjectProject(out);
-            }catch (JSONException e){
-                e.printStackTrace();
-            }
-        });
+    public boolean isLoginType() {
+        return loginType;
     }
 
     // update 2.0.0
-    public void getProject(PCLoginModel account,ProjectCallback abc, String tokenProject, String[] fields) {
+    public String getUsername() {
+        return username;
+    }
+
+    // update 2.0.0
+    public void setProject(String tokenProject, String[] fields){
         String payload = generatePayload(tokenProject, fields);
         ConnectionMethod connectionMethod = new ConnectionMethod();
-        connectionMethod.setAccount(account);
+        connectionMethod.setAccount(this.credentials);
         connectionMethod.execute("project", payload);
-        connectionMethod.responds((String body) ->{
-            try{
-                JSONObject res = new JSONObject(body);
-                PCProjectModel out = null;
-
-                // convert to object
-                if (res.getInt("errno") == 0){
-                    // setCredential
-                    JSONObject crid = res.getJSONObject("credentials");
-                    PCCredentials newCCredentials = new PCCredentials(
-                            crid.getString("d"),
-                            crid.getString("s"),
-                            crid.getString("o")
-                    );
-                    setCredentials(newCCredentials);
-                    setLoginModel(new PCLoginModel(
-                            this.loginModel.getFlying_id(),
-                            this.loginModel.getFullname(),
-                            this.loginModel.getPhoto(),
-                            newCCredentials
-                    ));
-
-                    Gson gson =new Gson();
-                    out = gson.fromJson(
-                            res.getJSONObject("data").toString(), PCProjectModel.class);
-                    //System.out.println("Berhasil " + projectModel.getData().getMaintask().get(0).getTaskName());
-                }else{
-                    setError(res.getInt("errno"));
-                    setErrorMessage(res.getString("errmsg"));
-                }
-
-                // Update interface
-                abc.responseProject(
-                        res.getInt("errno"),
-                        res.getString("errmsg"),
-                        out
+        try{
+            String body = connectionMethod.get();
+            PCProjectModel out = null;
+            JSONObject res = new JSONObject(body);
+            // convert to object
+            if (res.getInt("errno") == 0){
+                // setCredential
+                JSONObject crid = res.getJSONObject("credentials");
+                PCCredentials newCCredentials = new PCCredentials(
+                        crid.getString("d"),
+                        crid.getString("s"),
+                        crid.getString("o")
                 );
+                setCredentials(newCCredentials);
+                setLoginModel(new PCLoginModel(
+                        this.loginModel.getFlying_id(),
+                        this.loginModel.getFullname(),
+                        this.loginModel.getPhoto(),
+                        newCCredentials
+                ));
+
+                Gson gson =new Gson();
+                out = gson.fromJson(
+                        res.getJSONObject("data").toString(), PCProjectModel.class);
+                //System.out.println("Berhasil " + projectModel.getData().getMaintask().get(0).getTaskName());
                 setSemuaObjectProject(out);
-            }catch (JSONException e){
-                e.printStackTrace();
+            }else{
+                setError(res.getInt("errno"));
+                setErrorMessage(res.getString("errmsg"));
             }
-        });
+        }catch (InterruptedException|ExecutionException|JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // update 2.0.0
+    public void getProject(PCCredentials credential,ProjectCallback listenerProject, String tokenProject, String[] fields) {
+        String payload = generatePayload(tokenProject, fields);
+        ConnectionMethod connectionMethod = new ConnectionMethod();
+        connectionMethod.setAccount(credential);
+        connectionMethod.execute("project", payload);
+        try{
+            String body = connectionMethod.get();
+            JSONObject res = new JSONObject(body);
+            PCProjectModel out = null;
+
+            // convert to object
+            if (res.getInt("errno") == 0){
+                // setCredential
+                JSONObject crid = res.getJSONObject("credentials");
+                PCCredentials newCCredentials = new PCCredentials(
+                        crid.getString("d"),
+                        crid.getString("s"),
+                        crid.getString("o")
+                );
+                setCredentials(newCCredentials);
+                setLoginModel(new PCLoginModel(
+                        this.loginModel.getFlying_id(),
+                        this.loginModel.getFullname(),
+                        this.loginModel.getPhoto(),
+                        newCCredentials
+                ));
+
+                Gson gson =new Gson();
+                out = gson.fromJson(
+                        res.getJSONObject("data").toString(), PCProjectModel.class);
+                //System.out.println("Berhasil " + projectModel.getData().getMaintask().get(0).getTaskName());
+                setSemuaObjectProject(out);
+            }else{
+                setError(res.getInt("errno"));
+                setErrorMessage(res.getString("errmsg"));
+            }
+
+            // Update interface
+            listenerProject.responseProject(
+                    res.getInt("errno"),
+                    res.getString("errmsg"),
+                    out
+            );
+
+        }catch (InterruptedException|ExecutionException|JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     // update 2.0.0
     public ProgrezCloudApi setUserKey(String userkey){
         this.userkey = userkey;
-        ConnectionMethod loginMethod = new ConnectionMethod();
-        loginMethod.execute("login","type=userkey&userkey="+userkey);
-        loginMethod.responds((String body) -> {
-            try {
-                JSONObject respond = new JSONObject(body);
-                if (respond.getInt("errno") > 0){
-                    this.error = respond.getInt("errno");
-                    this.errorMessage = respond.getString("errmsg");
-                }else{
-                    //success set loginModel and credential
-                    setLoginModel(generateAccount(respond));
-                }
-            }catch (JSONException e){
-                e.printStackTrace();
-            }
-        });
+        this.loginType = true;
+        return this;
+    }
+
+    // update 2.0.0
+    public ProgrezCloudApi setUserLogin(String username, String password){
+        this.username = username;
+        this.password = password;
+        this.loginType = false;
         return this;
     }
 
     //update 2.0.0
-    public void login(LoginCallback a, String username, String password) {
-        ConnectionMethod loginMethod = new ConnectionMethod();
-        loginMethod.execute("login","login="+username+"&password="+password);
-        loginMethod.responds((String body) -> {
-                    try{
-                        JSONObject respond = new JSONObject(body);
-                        PCLoginModel abc = null;
-                        if(respond.getInt("errno") == 0){
-                            abc = generateAccount(respond);
-                            setLoginModel(abc);
-                            setCredentials(abc.getCredentials());
-                        }
-
-                        a.responseLogin(
-                                respond.getInt("errno"),
-                                respond.getString("errmsg"),
-                                (respond.getInt("errno") > 0)?null:abc
-                        );
-                    }catch (JSONException e){
-                        e.printStackTrace();
-                    }
-                }
-        );
+    public void login(LoginCallback listener) {
+        ConnectionMethod connectionMethod = new ConnectionMethod();
+        if (loginType){
+            connectionMethod.execute("login","type=userkey&userkey="+userkey);
+        }else{
+            connectionMethod.execute("login","login="+username+"&password="+password);
+        }
+        try {
+            String body = connectionMethod.get();
+            JSONObject respond = new JSONObject(body);
+            PCLoginModel profile = null;
+            if(respond.getInt("errno") == 0){
+                profile = generateAccount(respond);
+                setLoginModel(profile);
+                setCredentials(profile.getCredentials());
+            }
+            listener.responseLogin(
+                    respond.getInt("errno"),
+                    respond.getString("errmsg"),
+                    (respond.getInt("errno") > 0)?null:profile
+            );
+            setError(respond.getInt("errno"));
+            setErrorMessage(respond.getString("errmsg"));
+        } catch (InterruptedException|ExecutionException|JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     // update 2.0.0
     public void loadNewCridential(){
-        ConnectionMethod loginMethod = new ConnectionMethod();
-        loginMethod.execute("login","type=userkey&userkey="+userkey);
-        loginMethod.responds((String body) -> {
-            try{
-                JSONObject respond = new JSONObject(body);
-                if (respond.getInt("errno") > 0){
-                    this.error = respond.getInt("errno");
-                    this.errorMessage = respond.getString("errmsg");
-                }else{
-                    //success set loginModel and credential
-                    setLoginModel(generateAccount(respond));
-                }
-
-            }catch (JSONException e){
-                e.printStackTrace();
+        ConnectionMethod connectionMethod = new ConnectionMethod();
+        if (loginType){
+            connectionMethod.execute("login","type=userkey&userkey="+userkey);
+        }else{
+            connectionMethod.execute("login","login="+username+"&password="+password);
+        }
+        try {
+            String body = connectionMethod.get();
+            JSONObject respond = new JSONObject(body);
+            if (respond.getInt("errno") > 0){
+                this.error = respond.getInt("errno");
+                this.errorMessage = respond.getString("errmsg");
+            }else{
+                //success set loginModel and credential
+                setLoginModel(generateAccount(respond));
             }
-        });
-    }
-
-    //update 2.0.0
-    public void login(LoginCallback a, String userkey) {
-            ConnectionMethod loginMethod = new ConnectionMethod();
-            loginMethod.execute("login","type=userkey&userkey="+userkey);
-            loginMethod.responds((String body) -> {
-                    try{
-                        JSONObject respond = new JSONObject(body);
-                        PCLoginModel abc = null;
-                        if(respond.getInt("errno") == 0){
-                            abc = generateAccount(respond);
-                            setLoginModel(abc);
-                            setCredentials(abc.getCredentials());
-                        }
-
-                        a.responseLogin(
-                                respond.getInt("errno"),
-                                respond.getString("errmsg"),
-                                (respond.getInt("errno") > 0)?null:abc
-                        );
-                    }catch (JSONException e){
-                        e.printStackTrace();
-                    }
-                }
-            );
+        } catch (InterruptedException|ExecutionException|JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     // update 2.0.0
@@ -360,24 +345,18 @@ public class ProgrezCloudApi {
             );
         }catch (JSONException ex){
             ex.printStackTrace();
+            Log.i(TAG, "generateAccount: "+ex.getMessage());
         }
         return pcLogin;
     }
 
-    // update 1.2.0
-    static class ConnectionMethod extends AsyncTask<String, String, String> {
-        interface onCallback {
-            void respond(String body);
-        }
+    // update 2.0.0
+    class ConnectionMethod extends AsyncTask<String, String, String> {
         private String body;
 
-        onCallback onCallback;
-        void responds(onCallback a){
-            onCallback=a;
-        }
 
-        PCLoginModel accon;
-        void setAccount(PCLoginModel ac){
+        PCCredentials accon;
+        void setAccount(PCCredentials ac){
             this.accon = ac;
         }
 
@@ -394,19 +373,18 @@ public class ProgrezCloudApi {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            onCallback.respond(s);
         }
 
         private String actLogin(String urlParameters){
             String result = null;
             URL url;
-            HttpsURLConnection conn = null;
+            HttpURLConnection conn = null;
             try {
                 byte[] postData       = urlParameters.getBytes( StandardCharsets.UTF_8 );
                 int    postDataLength = postData.length;
                 String request        = "https://progrez.cloud/s/fox/login";
                 url            = new URL( request );
-                conn= (HttpsURLConnection) url.openConnection();
+                conn= (HttpURLConnection) url.openConnection();
                 conn.setDoOutput( true );
                 conn.setInstanceFollowRedirects( false );
                 conn.setRequestMethod( "POST" );
@@ -437,15 +415,14 @@ public class ProgrezCloudApi {
             return result;
         }
 
-        private String actProject(PCLoginModel accouts, String payload){
+        private String actProject(PCCredentials credentials, String payload){
             String result = null;
-            PCCredentials credentials = accouts.getCredentials();
             try {
                 byte[] postData       = payload.getBytes( StandardCharsets.UTF_8 );
                 int    postDataLength = postData.length;
                 String request        = "https://progrez.cloud/s/fox/project";
                 URL    url            = new URL( request );
-                HttpsURLConnection conn= (HttpsURLConnection) url.openConnection();
+                HttpURLConnection conn= (HttpURLConnection) url.openConnection();
                 conn.setDoOutput( true );
                 conn.setInstanceFollowRedirects( false );
                 conn.setRequestMethod( "POST" );
