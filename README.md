@@ -1,37 +1,60 @@
 # Progrez Cloud API Android
 
-Untuk mengurangi waktu ngopi, saya meringkas penulisan kode untuk mengambil data dari project teman2.
-Kodingan ini melputi <b>Authentication User</b>, dan <b>Reading Tasks</b>. Lihatlah bagai mana saya mendapatkannya.
+### new update
+
+Ada beberapa pembahruan seperti:
+- Autentikasi pada saat mengambil project, di mana programnya melakukan 2x request. Setelah di lakukan pembahruan, sekarang saya hanya perlu melakukan 1x request untuk mendapatkan project.
+- Ada beberapa fugsi yang bisa di tambahkan untuk mempermudah, dalam pengerjaan antarmuka pengguna.
+- Saya membuang beberapa kodingan usang di versi sebelumnya.
+
+## Example Source
 
 ```java
-progrezCloudApi.login((err, msg, objAccount)->{}, "userkey");
-```
-```java
-progrezCloudApi.login((err, msg, objAccount)->{}, "username", "password");
-```
-```java
-progrezCloudApi.getProject(objAccount, (err, msg, body)->{}, "token_project", "fields");
+ProgrezCloudApi api = new ProgrezCloudApi().setUserKey( USERKEY);
+api.login((int errno, String errmsg, PCLoginModel account) -> {
+    // account.getCredentials() // new Credentials
+}); // dalam fungsi ini credentials baru akan di buat, dan bisa di gunakan lagi
+
+api.setProject(TOKEN_PROJECT, new String[]{
+    "all",      // Maintasks
+    "all",      // Taks
+    "all"       // Subtasks
+}); // dalam fungsi ini credentials 's' baru akan di buat, dan bisa di gunakan lagi
+    // Penjelasan: progres.cloud memiliki 3 credentials, 'd', 'o', dan 's' 
+    // credentials d tidak akan berubah, o dan s akan berubah ketika kita melakukan login
+    // dan s akan berubah ketika kita mengambil project
+    
+if(api.getError() == 0){
+    echo(api.getProject().getName());
+}else{
+    echo(api.getErrorMessage());
+}
 ```
 
-Untuk fields silahkan pilih yang ingin di tampilkan <b><i>task_name , datetime , status_done , author, description , 
-filenya , tasktype , nominal , quantity , debitcredit , sticky , datetime_done , privacy </i></b> dan untuk menampilkan semua 
-fields gunakan <b><i>all</i></b>.
+### Setter
 
-## contoh penggunaan
-```java
-ProgrezCloudApi progrezCloudApi = new ProgrezCloudApi(); // initial class
-progrezCloudApi.login((int errno, String errmsg, PCLoginModel account) -> {
-  if (errno == 0)
-    progrezCloudApi.getProject(account, (int errno2, String errmsg2, PCProjectModel body) -> {
-      setNama(account.getFullName());             // menampilkan namamu
-      setGambarProfile(account.getProfile());     // menampilkan gambar profile
-      tampilkanProject(body);                     // menampilkan project
-    },"TOKEN_PROJECT", new String[]{
-         "all", // maintask field
-         "all", // task field
-         "all" // subtask field
-    });
-},"USER_KEY");
+```
+setUserKey(userkey): Fungsi untuk melakukan login dengan userkey
+setUserLogin(username, password)
+setProject(tokenproject, fields): Fungsi untuk mengubah detail proyek pada ProgrezCloudApi.
+loadNewCridential(): Fungsi ini untuk mendapatkan akses baru, jika sewaktu2 akses lama usang
+```
+
+### Getter
+
+```
+login(listener): Membuat akun dan menyimpan Credential
+loadNewCridential(): Re-login
+getUsername(): Mengambil Username ketika return dari isLoginType(): false
+getProject(): Fungsi untuk mendapatkan detail proyek setelah melakukan setProject(String tokenproject, String[] fields)
+getProject(cridentials , listener, tokenProject, fields): Fungsi untuk mendapatkan detail proyek pada ProgrezCloudApi dengan menggunakan ProjectCallback.
+getMaintasks(): Fungsi untuk mendapatkan daftar tugas utama dalam suatu proyek.
+isLoginType(): Menentukan login mengunakan (userkey): true, atau mengunakan (username,password): false
+getUserkey(): Fungsi untuk mendapatkan kunci pengguna ProgrezCloudApi.
+getProfileUser(): Fungsi untuk mendapatkan model login pengguna.
+getCredentials(): Fungsi untuk mendapatkan kredensial pengguna ProgrezCloudApi.
+getError(): Fungsi untuk mendapatkan kode kesalahan saat melakukan permintaan ke ProgrezCloudApi.
+getErrorMessage(): Fungsi untuk mendapatkan pesan kesalahan saat melakukan permintaan ke ProgrezCloudApi.
 ```
 ## implementation
 ```
@@ -44,7 +67,7 @@ allprojects {
 ```
 ```
 dependencies {
-  implementation 'com.github.AgungDev:ProgrezCloudApiAndroid:1.2.0'
+  implementation 'com.github.AgungDev:ProgrezCloudApiAndroid:2.0.0'
 }
 ```
 
