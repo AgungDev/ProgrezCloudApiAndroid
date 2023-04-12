@@ -3,60 +3,76 @@ package fun5i.app.api.Model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+// update 2.0.1
 public class Subtask {
 
-@SerializedName("total")
-@Expose
-private String total;
-@SerializedName("status_done")
-@Expose
-private String statusDone;
-@SerializedName("flying_id")
-@Expose
-private String flyingId;
+    @SerializedName("task_name")
+    @Expose
+    private String taskName;
+    @SerializedName("total")
+    @Expose
+    private String total;
+    @SerializedName("status_done")
+    @Expose
+    private String statusDone;
+    @SerializedName("flying_id")
+    @Expose
+    private String flyingId;
 
-/**
-* No args constructor for use in serialization
-*
-*/
-public Subtask() {
-}
+    /**
+     * No args constructor for use in serialization
+     *
+     */
+    public Subtask() {
+    }
 
-/**
-*
-* @param total
-* @param flyingId
-* @param statusDone
-*/
-public Subtask(String total, String statusDone, String flyingId) {
-super();
-this.total = total;
-this.statusDone = statusDone;
-this.flyingId = flyingId;
-}
+    /**
+     *
+     * @param taskName
+     * @param total
+     * @param flyingId
+     * @param statusDone
+     */
+    public Subtask(String taskName, String total, String statusDone, String flyingId) {
+        super();
+        this.taskName = taskName;
+        this.total = total;
+        this.statusDone = statusDone;
+        this.flyingId = flyingId;
+    }
 
-public String getTotal() {
-return total;
-}
+    public String getTaskName() {
+        return taskName;
+    }
 
-public void setTotal(String total) {
-this.total = total;
-}
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
+    }
 
-public String getStatusDone() {
-return statusDone;
-}
 
-public void setStatusDone(String statusDone) {
-this.statusDone = statusDone;
-}
 
-public String getFlyingId() {
-return flyingId;
-}
+    public String getTotal() {
+        return total;
+    }
 
-public void setFlyingId(String flyingId) {
-this.flyingId = flyingId;
-}
+    public void setTotal(String total) {
+        this.total = total;
+    }
+
+    public String getStatusDone() {
+        return statusDone;
+    }
+
+    public void setStatusDone(String statusDone) {
+        this.statusDone = statusDone;
+    }
+
+    public String getFlyingId() {
+        return flyingId;
+    }
+
+    public void setFlyingId(String flyingId) {
+        this.flyingId = flyingId;
+    }
 
 }
