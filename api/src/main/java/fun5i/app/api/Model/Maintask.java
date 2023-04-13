@@ -120,8 +120,8 @@ public class Maintask {
         this.author = author;
     }
 
-    public int getTasktype() {
-        return Integer.parseInt(tasktype);
+    public String getTasktype() {
+        return tasktype;
     }
 
     public void setTasktype(String tasktype) {
@@ -144,8 +144,8 @@ public class Maintask {
         this.datetime = datetime;
     }
 
-    public int getStatusDone() {
-        return Integer.parseInt(statusDone);
+    public String getStatusDone() {
+        return statusDone ;
     }
 
     public void setStatusDone(String statusDone) {
@@ -168,16 +168,16 @@ public class Maintask {
         this.filenya = filenya;
     }
 
-    public int getNominal() {
-        return Integer.parseInt(nominal);
+    public String getNominal() {
+        return nominal;
     }
 
     public void setNominal(String nominal) {
         this.nominal = nominal;
     }
 
-    public int getQuantity() {
-        return Integer.parseInt(quantity);
+    public String getQuantity() {
+        return quantity;
     }
 
     public void setQuantity(String quantity) {
@@ -208,8 +208,8 @@ public class Maintask {
         this.datetimeDone = datetimeDone;
     }
 
-    public int getPrivacy() {
-        return Integer.parseInt(privacy);
+    public String getPrivacy() {
+        return privacy;
     }
 
     public void setPrivacy(String privacy) {
@@ -240,8 +240,8 @@ public class Maintask {
         this.isParent = isParent;
     }
 
-    public int getTotal() {
-        return Integer.parseInt(total);
+    public String getTotal() {
+        return total;
     }
 
     public void setTotal(String total) {

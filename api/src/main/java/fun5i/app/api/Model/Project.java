@@ -60,8 +60,8 @@ public class Project {
         this.image = image;
     }
 
-    public int getStatusDone() {
-        return Integer.parseInt(statusDone);
+    public String getStatusDone() {
+        return statusDone;
     }
 
     public void setStatusDone(String statusDone) {
@@ -76,16 +76,16 @@ public class Project {
         this.name = name;
     }
 
-    public int getPrivacy() {
-        return Integer.parseInt(privacy);
+    public String getPrivacy() {
+        return privacy;
     }
 
     public void setPrivacy(String privacy) {
         this.privacy = privacy;
     }
 
-    public int getProgress() {
-        return Integer.parseInt(progress);
+    public String getProgress() {
+        return progress;
     }
 
     public void setProgress(String progress) {
