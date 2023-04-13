@@ -29,12 +29,16 @@ import fun5i.app.api.Model.Project;
 
 
 /**
- * version 2.0.0
+ * version 3.0.0
  * @author fun5i
  */
 public class ProgrezCloudApi {
 
     private static final String TAG = "ProgrezCloudApi";
+
+    // update 3.0.0
+    public static final String ALL_FIELDS = "task_name, datetime, status_done, author, description, filenya, tasktype, nominal, quantity, debitcredit, sticky, datetime_done, privacy";
+
 
     // update 2.0.0
     public interface ProgrezApiListener{
@@ -135,8 +139,18 @@ public class ProgrezCloudApi {
         this.errorMessage = errorMessage;
     }
 
-    // update 1.2.0
-    private String generatePayload(String tokenProject, String[] fields){
+    // update 2.0.0
+    public boolean isLoginType() {
+        return loginType;
+    }
+
+    // update 2.0.0
+    public String getUsername() {
+        return username;
+    }
+
+    // update 3.0.0
+    private String generatePayloadProject(String tokenProject, String[] fields){
         String result = null;
         try {
             JSONObject payload = new JSONObject();
@@ -150,49 +164,75 @@ public class ProgrezCloudApi {
             payload.put("token", tokenProject);
 
             result = payload.toString();
-        }catch (JSONException e){
+        }catch (ArrayIndexOutOfBoundsException|JSONException e){
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    // update 3.0.0
+    public String exampleGeneratePayload(String tokenProject, String flayingId, String fields){
+        String result = null;
+        try {
+            JSONObject payload = new JSONObject();
+            JSONObject payload2 = new JSONObject();
+
+            payload2.put("fields", fields);
+            payload2.put("limit", 100);// 100 raw
+
+            payload.put("subtask", payload2);
+            payload.put("fields", fields);
+            payload.put("flying_id", flayingId);
+            payload.put("token", tokenProject);
+
+            result = payload.toString();
+        }catch (ArrayIndexOutOfBoundsException|JSONException e){
             e.printStackTrace();
         }
 
         return result;
     }
 
-    // update 2.0.0
-    public boolean isLoginType() {
-        return loginType;
+    // update 3.0.0
+    public String QueryTasks(String payload){
+        String body = "";
+        ConnectionMethod connectionMethod = new ConnectionMethod();
+        connectionMethod.setAccount(this.credentials);
+        connectionMethod.execute("task", payload);
+        try{
+            body = connectionMethod.get();
+            JSONObject res = new JSONObject(body);
+            // convert to object
+            if (res.getInt("errno") == 0){
+                // setCredential
+                JSONObject crid = res.getJSONObject("credentials");
+                setCredential(crid);
+            }else{
+                setError(res.getInt("errno"));
+                setErrorMessage(res.getString("errmsg"));
+            }
+        }catch (InterruptedException|ExecutionException|JSONException e) {
+            e.printStackTrace();
+        }
+        return body;
     }
 
-    // update 2.0.0
-    public String getUsername() {
-        return username;
-    }
-
-    // update 2.0.0
-    public void setProject(String tokenProject, String[] fields){
-        String payload = generatePayload(tokenProject, fields);
+    // update 3.0.0
+    public String setProject(String tokenProject, String[] fields){
+        String body = "";
+        String payload = generatePayloadProject(tokenProject, fields);
         ConnectionMethod connectionMethod = new ConnectionMethod();
         connectionMethod.setAccount(this.credentials);
         connectionMethod.execute("project", payload);
         try{
-            String body = connectionMethod.get();
+            body = connectionMethod.get();
             PCProjectModel out = null;
             JSONObject res = new JSONObject(body);
             // convert to object
             if (res.getInt("errno") == 0){
                 // setCredential
                 JSONObject crid = res.getJSONObject("credentials");
-                PCCredentials newCCredentials = new PCCredentials(
-                        crid.getString("d"),
-                        crid.getString("s"),
-                        crid.getString("o")
-                );
-                setCredentials(newCCredentials);
-                setLoginModel(new PCLoginModel(
-                        this.loginModel.getFlying_id(),
-                        this.loginModel.getFullname(),
-                        this.loginModel.getPhoto(),
-                        newCCredentials
-                ));
+                setCredential(crid);
 
                 Gson gson =new Gson();
                 out = gson.fromJson(
@@ -206,16 +246,19 @@ public class ProgrezCloudApi {
         }catch (InterruptedException|ExecutionException|JSONException e) {
             e.printStackTrace();
         }
+
+        return body;
     }
 
-    // update 2.0.0
-    public void getProject(PCCredentials credential,ProjectCallback listenerProject, String tokenProject, String[] fields) {
-        String payload = generatePayload(tokenProject, fields);
+    // update 3.0.0
+    public String getProject(PCCredentials credential,ProjectCallback listenerProject, String tokenProject, String[] fields) {
+        String body = "";
+        String payload = generatePayloadProject(tokenProject, fields);
         ConnectionMethod connectionMethod = new ConnectionMethod();
         connectionMethod.setAccount(credential);
         connectionMethod.execute("project", payload);
         try{
-            String body = connectionMethod.get();
+            body = connectionMethod.get();
             JSONObject res = new JSONObject(body);
             PCProjectModel out = null;
 
@@ -223,29 +266,16 @@ public class ProgrezCloudApi {
             if (res.getInt("errno") == 0){
                 // setCredential
                 JSONObject crid = res.getJSONObject("credentials");
-                PCCredentials newCCredentials = new PCCredentials(
-                        crid.getString("d"),
-                        crid.getString("s"),
-                        crid.getString("o")
-                );
-                setCredentials(newCCredentials);
-                setLoginModel(new PCLoginModel(
-                        this.loginModel.getFlying_id(),
-                        this.loginModel.getFullname(),
-                        this.loginModel.getPhoto(),
-                        newCCredentials
-                ));
+                setCredential(crid);
 
                 Gson gson =new Gson();
                 out = gson.fromJson(
                         res.getJSONObject("data").toString(), PCProjectModel.class);
-                //System.out.println("Berhasil " + projectModel.getData().getMaintask().get(0).getTaskName());
                 setSemuaObjectProject(out);
             }else{
                 setError(res.getInt("errno"));
                 setErrorMessage(res.getString("errmsg"));
             }
-
             // Update interface
             listenerProject.responseProject(
                     res.getInt("errno"),
@@ -256,25 +286,32 @@ public class ProgrezCloudApi {
         }catch (InterruptedException|ExecutionException|JSONException e) {
             e.printStackTrace();
         }
+        return body;
     }
 
-    // update 2.0.0
-    public ProgrezCloudApi setUserKey(String userkey){
-        this.userkey = userkey;
-        this.loginType = true;
-        return this;
+    //update 3.0.0
+    private void setCredential(JSONObject cred){
+        try {
+            PCCredentials newCCredentials = new PCCredentials(
+                    cred.getString("d"),
+                    cred.getString("s"),
+                    cred.getString("o")
+            );
+            setCredentials(newCCredentials);
+            setLoginModel(new PCLoginModel(
+                    this.loginModel.getFlying_id(),
+                    this.loginModel.getFullname(),
+                    this.loginModel.getPhoto(),
+                    newCCredentials
+            ));
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
     }
 
-    // update 2.0.0
-    public ProgrezCloudApi setUserLogin(String username, String password){
-        this.username = username;
-        this.password = password;
-        this.loginType = false;
-        return this;
-    }
-
-    //update 2.0.0
-    public void login(LoginCallback listener) {
+    //update 3.0.0
+    public String login(LoginCallback listener) {
+        String body = "";
         ConnectionMethod connectionMethod = new ConnectionMethod();
         if (loginType){
             connectionMethod.execute("login","type=userkey&userkey="+userkey);
@@ -282,7 +319,7 @@ public class ProgrezCloudApi {
             connectionMethod.execute("login","login="+username+"&password="+password);
         }
         try {
-            String body = connectionMethod.get();
+            body = connectionMethod.get();
             JSONObject respond = new JSONObject(body);
             PCLoginModel profile = null;
             if(respond.getInt("errno") == 0){
@@ -300,10 +337,27 @@ public class ProgrezCloudApi {
         } catch (InterruptedException|ExecutionException|JSONException e) {
             e.printStackTrace();
         }
+        return body;
     }
 
     // update 2.0.0
-    public void loadNewCridential(){
+    public ProgrezCloudApi setUserKey(String userkey){
+        this.userkey = userkey;
+        this.loginType = true;
+        return this;
+    }
+
+    // update 2.0.0
+    public ProgrezCloudApi setUserLogin(String username, String password){
+        this.username = username;
+        this.password = password;
+        this.loginType = false;
+        return this;
+    }
+
+    // update 3.0.0
+    public String loadNewCridential(){
+        String body = "";
         ConnectionMethod connectionMethod = new ConnectionMethod();
         if (loginType){
             connectionMethod.execute("login","type=userkey&userkey="+userkey);
@@ -311,7 +365,7 @@ public class ProgrezCloudApi {
             connectionMethod.execute("login","login="+username+"&password="+password);
         }
         try {
-            String body = connectionMethod.get();
+            body = connectionMethod.get();
             JSONObject respond = new JSONObject(body);
             if (respond.getInt("errno") > 0){
                 this.error = respond.getInt("errno");
@@ -323,6 +377,7 @@ public class ProgrezCloudApi {
         } catch (InterruptedException|ExecutionException|JSONException e) {
             e.printStackTrace();
         }
+        return body;
     }
 
     // update 2.0.0
@@ -350,7 +405,7 @@ public class ProgrezCloudApi {
         return pcLogin;
     }
 
-    // update 2.0.0
+    // update 3.0.0
     class ConnectionMethod extends AsyncTask<String, String, String> {
         private String body;
 
@@ -366,6 +421,8 @@ public class ProgrezCloudApi {
                 body = actLogin(parms[1]);
             }else if(parms[0].equals("project")){
                 body = actProject(accon, parms[1]);
+            }else if(parms[0].equals("task")){
+                body = actTasks(accon, parms[1]);
             }
             return body;
         }
@@ -421,6 +478,45 @@ public class ProgrezCloudApi {
                 byte[] postData       = payload.getBytes( StandardCharsets.UTF_8 );
                 int    postDataLength = postData.length;
                 String request        = "https://progrez.cloud/s/fox/project";
+                URL    url            = new URL( request );
+                HttpURLConnection conn= (HttpURLConnection) url.openConnection();
+                conn.setDoOutput( true );
+                conn.setInstanceFollowRedirects( false );
+                conn.setRequestMethod( "POST" );
+
+                JSONObject crFox = new JSONObject();
+                crFox.put("d", credentials.getD());
+                crFox.put("s", credentials.getS());
+                crFox.put("o", credentials.getO());
+
+                conn.setRequestProperty( "Credential-Fox", crFox.toString());
+                conn.setRequestProperty( "charset", "utf-8");
+                conn.setRequestProperty( "Content-Length", Integer.toString( postDataLength ));
+                try( DataOutputStream wr = new DataOutputStream( conn.getOutputStream())) {
+                    wr.write( postData );
+                }
+
+                StringBuilder sb = new StringBuilder();
+                String line;
+                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                while ((line = reader.readLine()) != null) {
+                    //System.out.println(line);
+                    sb.append(line);
+                }
+                result = sb.toString();
+            }catch(IOException|JSONException e){
+                e.printStackTrace();
+            }
+
+            return result;
+        }
+
+        private String actTasks(PCCredentials credentials, String payload){
+            String result = null;
+            try {
+                byte[] postData       = payload.getBytes( StandardCharsets.UTF_8 );
+                int    postDataLength = postData.length;
+                String request        = "https://progrez.cloud/s/fox/task";
                 URL    url            = new URL( request );
                 HttpURLConnection conn= (HttpURLConnection) url.openConnection();
                 conn.setDoOutput( true );

@@ -3,6 +3,7 @@ package fun5i.app.api.Model;
  *
  * @author fun5i
  */
+// update 1.2.0
 public class PCCredentials {
 
     private String d,s,o;

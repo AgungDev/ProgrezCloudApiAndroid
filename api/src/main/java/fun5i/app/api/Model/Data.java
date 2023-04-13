@@ -4,6 +4,7 @@ import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+// update 1.2.0
 public class Data {
 
 @SerializedName("maintask")

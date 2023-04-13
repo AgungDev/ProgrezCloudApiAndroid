@@ -1,12 +1,14 @@
 package fun5i.app.api.Model;
-
 import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-// update 2.0.1
+// update 3.0.0
 public class Task {
 
+    @SerializedName("author")
+    @Expose
+    private Author author;
     @SerializedName("tasktype")
     @Expose
     private String tasktype;
@@ -69,6 +71,7 @@ public class Task {
      * @param quantity
      * @param isParent
      * @param flyingId
+     * @param author
      * @param datetimeDone
      * @param description
      * @param privacy
@@ -82,13 +85,9 @@ public class Task {
      * @param sticky
      * @param taskName
      */
-    public Task(String tasktype, String taskName,
-                String datetime, String statusDone, String description,
-                String filenya, String nominal, String quantity, String debitcredit,
-                String sticky, String datetimeDone, String privacy, String flyingId,
-                String isParent, String total, List<Subtask> subtask) {
+    public Task(Author author, String tasktype, String taskName, String datetime, String statusDone, String description, String filenya, String nominal, String quantity, String debitcredit, String sticky, String datetimeDone, String privacy, String flyingId, String isParent, String total, List<Subtask> subtask) {
         super();
-
+        this.author = author;
         this.tasktype = tasktype;
         this.taskName = taskName;
         this.datetime = datetime;
@@ -107,8 +106,17 @@ public class Task {
         this.subtask = subtask;
     }
 
-    public String getTasktype() {
-        return tasktype;
+
+    public Author getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(Author author) {
+        this.author = author;
+    }
+
+    public int getTasktype() {
+        return Integer.parseInt(tasktype);
     }
 
     public void setTasktype(String tasktype) {
@@ -131,8 +139,8 @@ public class Task {
         this.datetime = datetime;
     }
 
-    public String getStatusDone() {
-        return statusDone;
+    public boolean getStatusDone() {
+        return Boolean.parseBoolean(statusDone);
     }
 
     public void setStatusDone(String statusDone) {
@@ -155,16 +163,16 @@ public class Task {
         this.filenya = filenya;
     }
 
-    public String getNominal() {
-        return nominal;
+    public int getNominal() {
+        return Integer.parseInt(nominal);
     }
 
     public void setNominal(String nominal) {
         this.nominal = nominal;
     }
 
-    public String getQuantity() {
-        return quantity;
+    public int getQuantity() {
+        return Integer.parseInt(quantity);
     }
 
     public void setQuantity(String quantity) {
@@ -195,8 +203,8 @@ public class Task {
         this.datetimeDone = datetimeDone;
     }
 
-    public String getPrivacy() {
-        return privacy;
+    public int getPrivacy() {
+        return Integer.parseInt(privacy);
     }
 
     public void setPrivacy(String privacy) {
@@ -211,16 +219,16 @@ public class Task {
         this.flyingId = flyingId;
     }
 
-    public String getIsParent() {
-        return isParent;
+    public boolean getIsParent() {
+        return Boolean.parseBoolean(isParent);
     }
 
     public void setIsParent(String isParent) {
         this.isParent = isParent;
     }
 
-    public String getTotal() {
-        return total;
+    public int getTotal() {
+        return Integer.parseInt(total);
     }
 
     public void setTotal(String total) {
